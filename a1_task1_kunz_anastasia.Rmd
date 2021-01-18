@@ -22,9 +22,10 @@ library(patchwork)
 frog_data <- read_excel(here("data","sierra_amphibians.xlsx"))
   
 ```
+#### Data Wrangling for Graph 1 
+Total Mountain Yellow-Legged Frog count each year
 
 ```{r}
-# Graph 1: total Mountain Yellow-Legged Frog count each year
 
 total_yellow <- frog_data %>% 
   filter(amphibian_species == "RAMU") %>% 
@@ -44,12 +45,16 @@ year_totals <-ggplot(total_yellow, aes(x = year, y = n))+
     title = "Mountian Yellow-Legged Frog Count by Life Stage"
   )
   
+# Question: not sure best way to present data with the different life stages having such spread out values; when displaying tadpoles it makes it hard to read adult stage. Would the stacked graph be better? using fill = amphibian_life_stage to show the relative amounts? or is that harder to read?
 
 
 ```
 
+
+#### Data Wrangling for Graph 2
+Top 5 lakes with greatest Adult and SubAdult counts of Yellow-Legged Frogs
 ```{r}
-# Graph 2: Top 5 lakes with greatest Adult and SubAdult counts of Yellow-Legged Frogs
+
 lake_counts <- frog_data %>% 
   filter(amphibian_species == "RAMU") %>% 
   filter(amphibian_life_stage == c("Adult", "SubAdult")) %>% 
@@ -71,8 +76,10 @@ top5 <- ggplot(lake_counts, aes(x = fct_reorder(lake_id, total_amphibian), y = t
 
 ```
 
+#### Combining graphs using patchwork
+
 ```{r}
-# Combine using patchwork
+
 patchwork_graph <- (year_totals/top5) & theme_minimal()
 
 patchwork_graph
