@@ -37,7 +37,12 @@ total_yellow <- frog_data %>%
 
 year_totals <-ggplot(total_yellow, aes(x = year, y = n))+
   geom_col()+
-  facet_wrap(~amphibian_life_stage)
+  facet_wrap(~amphibian_life_stage)+
+  labs(
+    x = "Year",
+    y = "Total Count",
+    title = "Mountian Yellow-Legged Frog Count by Life Stage"
+  )
   
 
 
@@ -63,15 +68,12 @@ top5 <- ggplot(lake_counts, aes(x = fct_reorder(lake_id, total_amphibian), y = t
     title = "Top 5 Lakes with Highest Mountain Yellow-Legged Frogs",
     subtitle = "Adult and SubAdult Rana muscosa, 1995 - 2002"
   )
-  
-  
-  
 
 ```
 
 ```{r}
 # Combine using patchwork
-patchwork_graph <- (top5/year_totals) & theme_minimal()
+patchwork_graph <- (year_totals/top5) & theme_minimal()
 
 patchwork_graph
 ```
