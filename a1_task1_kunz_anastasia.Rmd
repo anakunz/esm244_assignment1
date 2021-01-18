@@ -1,0 +1,91 @@
+---
+title: 'Assignment 1: Sierra Amphibians'
+author: "Anastasia Kunz"
+date: "1/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+library(tidyverse)
+library(janitor)
+library(here)
+library(readxl)
+library(lubridate)
+library(patchwork)
+```
+
+
+
+```{r}
+# Read in data
+frog_data <- read_excel(here("data","sierra_amphibians.xlsx"))
+  
+```
+#### Data Wrangling for Graph 1 
+Total Mountain Yellow-Legged Frog count each year
+
+```{r}
+
+total_yellow <- frog_data %>% 
+  filter(amphibian_species == "RAMU") %>% 
+  filter(amphibian_life_stage != "EggMass") %>% 
+  mutate(date = ymd(survey_date)) %>% 
+  mutate(year = year(date)) %>% 
+  drop_na(amphibian_number) %>% 
+  count(year, amphibian_life_stage, wt = amphibian_number)
+
+
+year_totals <-ggplot(total_yellow, aes(x = year, y = n))+
+  geom_col()+
+  facet_wrap(~amphibian_life_stage)+
+  labs(
+    x = "Year",
+    y = "Total Count",
+    title = "Mountian Yellow-Legged Frog Count by Life Stage"
+  )
+  
+# Question: not sure best way to present data with the different life stages having such spread out values; when displaying tadpoles it makes it hard to read adult stage. Would the stacked graph be better? using fill = amphibian_life_stage to show the relative amounts? or is that harder to read?
+
+
+```
+
+
+#### Data Wrangling for Graph 2
+Top 5 lakes with greatest Adult and SubAdult counts of Yellow-Legged Frogs
+```{r}
+
+lake_counts <- frog_data %>% 
+  filter(amphibian_species == "RAMU") %>% 
+  filter(amphibian_life_stage == c("Adult", "SubAdult")) %>% 
+  mutate(lake_id = as.character(lake_id)) %>% 
+  mutate(lake_id = paste("Lake", lake_id, sep = " ")) %>% 
+  count(lake_id, wt = amphibian_number) %>% 
+  rename(total_amphibian = n) %>% 
+  slice_max(total_amphibian, n = 5)
+
+top5 <- ggplot(lake_counts, aes(x = fct_reorder(lake_id, total_amphibian), y = total_amphibian))+
+  geom_col(fill = "palegreen3")+
+  coord_flip()+
+  labs(
+    x = "Lake ID",
+    y = "Total Adult and SubAdult Count",
+    title = "Top 5 Lakes with Highest Mountain Yellow-Legged Frogs",
+    subtitle = "Adult and SubAdult Rana muscosa, 1995 - 2002"
+  )
+
+```
+
+#### Combining graphs using patchwork
+
+```{r}
+
+patchwork_graph <- (year_totals/top5) & theme_minimal()
+
+patchwork_graph
+```
+
+
+
+
+
