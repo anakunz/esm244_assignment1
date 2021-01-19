@@ -1,0 +1,49 @@
+---
+title: 'Assignment 1: Principal Components Analysis'
+author: "Anastasia Kunz"
+date: "1/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(janitor)
+library(tidyverse)
+library(ggfortify)
+
+
+
+```
+
+### Introduction
+
+This report will outline the nutirents found in herbs and spices from USDA's national Nutrient Database. 
+
+
+```{r}
+usda_nutrients <- read.csv(here("data", "usda_nutrients.csv")) %>% 
+  clean_names()
+
+herbs_spices <- usda_nutrients %>% 
+  filter(food_group == "Spices and Herbs") %>% 
+  select(energy_kcal : vit_b6_mg) %>% 
+  scale() %>% 
+  prcomp()
+
+
+herbs_spices$rotation # determine loading for the variables
+
+# create the reference dataset
+herbs_spices_ref <- usda_nutrients %>% 
+  filter(food_group == "Spices and Herbs") %>% 
+  select(id: short_descrip, energy_kcal : vit_b6_mg)
+
+autoplot(herbs_spices,
+         data = herbs_spices_ref, 
+        # colour = "species",
+         loadings = TRUE,
+         loadings.label = TRUE) +
+  theme_minimal()
+```
+
