@@ -22,8 +22,7 @@ library(patchwork)
 frog_data <- read_excel(here("data","sierra_amphibians.xlsx"))
   
 ```
-#### Data Wrangling for Graph 1 
-Total Mountain Yellow-Legged Frog count each year
+#### Total Mountain Yellow-Legged Frog count each year
 
 ```{r}
 
@@ -37,7 +36,7 @@ total_yellow <- frog_data %>%
 
 
 year_totals <-ggplot(total_yellow, aes(x = year, y = n))+
-  geom_col()+
+  geom_col(fill = "darkslategray3")+
   facet_wrap(~amphibian_life_stage)+
   labs(
     x = "Year",
@@ -51,8 +50,7 @@ year_totals <-ggplot(total_yellow, aes(x = year, y = n))+
 ```
 
 
-#### Data Wrangling for Graph 2
-Top 5 lakes with greatest Adult and SubAdult counts of Yellow-Legged Frogs
+#### Top 5 lakes with greatest Adult and SubAdult counts of Yellow-Legged Frogs
 ```{r}
 
 lake_counts <- frog_data %>% 
@@ -65,7 +63,7 @@ lake_counts <- frog_data %>%
   slice_max(total_amphibian, n = 5)
 
 top5 <- ggplot(lake_counts, aes(x = fct_reorder(lake_id, total_amphibian), y = total_amphibian))+
-  geom_col(fill = "palegreen3")+
+  geom_col(fill = "darkslategray3")+
   coord_flip()+
   labs(
     x = "Lake ID",
@@ -76,15 +74,18 @@ top5 <- ggplot(lake_counts, aes(x = fct_reorder(lake_id, total_amphibian), y = t
 
 ```
 
-#### Combining graphs using patchwork
+#### Data Visualization for Mountain Yellow-Legged Frogs
 
-```{r}
+```{r, fig.cap = "**Figure 1**. Mass (g) vs height (m)"}
 
 patchwork_graph <- (year_totals/top5) & theme_minimal()
 
 patchwork_graph
 ```
 
+#### References
+
+Knapp, R.A., C. Pavelka, E.E. Hegeman, and T.C. Smith. 2020. The Sierra Lakes Inventory Project: Non-Native fish and community composition of lakes and ponds in the Sierra Nevada, California ver 2. Environmental Data Initiative. https://doi.org/10.6073/pasta/d835832d7fd00d9e4466e44eea87fab3
 
 
 
