@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = T, message = FALSE, warning = FALSE)
 library(here)
 library(janitor)
 library(tidyverse)
@@ -18,32 +18,58 @@ library(ggfortify)
 
 ### Introduction
 
-This report will outline the nutirents found in herbs and spices from USDA's national Nutrient Database. 
+This report analyzes a subset of various climatic and landscape variables in 188 countries from data provided by @zander_venter through Google Earth Engine. Analyzed variables include elevation, mean annual rainfall, mean annual temperature, temperature seasonality, wind, cloudiness as well as crop and tree cover. In order to elucidate relationships between landscape variables like tree cover and cropland with more general climatic variables, I selected annual averages for rain and temperature instead of the quarterly averages. 
 
 
 ```{r}
-usda_nutrients <- read.csv(here("data", "usda_nutrients.csv")) %>% 
+world_env_vars <- read.csv(here("data", "world_env_vars.csv")) %>% 
   clean_names()
 
-herbs_spices <- usda_nutrients %>% 
-  filter(food_group == "Spices and Herbs") %>% 
-  select(energy_kcal : vit_b6_mg) %>% 
+environment <- world_env_vars %>% 
+  select(elevation, cropland_cover, tree_canopy_cover, temp_seasonality, rain_mean_annual, temp_mean_annual, wind, cloudiness) %>% 
+  drop_na(elevation, cropland_cover, tree_canopy_cover, temp_seasonality, rain_mean_annual, temp_mean_annual, wind, cloudiness) %>% 
   scale() %>% 
   prcomp()
 
 
-herbs_spices$rotation # determine loading for the variables
+environment$rotation # determine loading for the variables
 
 # create the reference dataset
-herbs_spices_ref <- usda_nutrients %>% 
-  filter(food_group == "Spices and Herbs") %>% 
-  select(id: short_descrip, energy_kcal : vit_b6_mg)
+env_ref <- world_env_vars %>% 
+  select(country,elevation, cropland_cover, tree_canopy_cover, temp_seasonality, rain_mean_annual, temp_mean_annual, wind, cloudiness) %>% 
+  drop_na(country,elevation, cropland_cover, tree_canopy_cover, temp_seasonality, rain_mean_annual, temp_mean_annual, wind, cloudiness)
 
-autoplot(herbs_spices,
-         data = herbs_spices_ref, 
-        # colour = "species",
+autoplot(environment,
+         data = env_ref,
          loadings = TRUE,
-         loadings.label = TRUE) +
-  theme_minimal()
+         alpha = .7,
+         colour = "midnightblue",
+         loadings.label = TRUE,
+         loadings.colour = "lightskyblue",
+         loadings.label.vjust = -1.2,
+         loadings.label.hjust = .6,
+         loadings.label.colour = "royalblue") +
+  theme_minimal()+
+  theme(panel.background=element_rect(fill='transparent',color='black',size=1), panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  labs(
+    title = "Country Climatic Variables Biplot"
+  )
 ```
+
+### Summary
+
+This biplot shows relationships between eight different variables across 188 different countries. Principal component 1 and principle component 2 together explain 62.49% of the variance for this dataset. Interesting variable relationships include:
+
+- inverse relationship between tree canopy cover and wind
+- high positive correlation between elevation and cropland cover
+- cropland cover and elevation have a negative correlation with mean annual temperature
+- cloudiness and wind are negatively correlated
+- mean annual rainfall and wind are also negatively correlated
+
+While a principle component analysis by nature gives up some explanatory power, these relationship are interesting to assess. For example, the general positive correlation between mean annual rainfall, cloudiness and tree canopy cover are anticipated and justifiable, however the strong correlation in this biplot between cropland and elevation requires more investigation.
+
+
+### Reference
+@zander_venter, Kaggle, Google Earth Engine. (2018). "Environmental Variables for World Countries: Misc climatic and environmental variables for world countries".
+
 
