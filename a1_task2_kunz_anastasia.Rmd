@@ -21,7 +21,7 @@ library(ggfortify)
 This report analyzes a subset of various climatic and landscape variables in 188 countries from data provided by @zander_venter through Google Earth Engine. Analyzed variables include elevation, mean annual rainfall, mean annual temperature, temperature seasonality, wind, cloudiness as well as crop and tree cover. In order to elucidate relationships between landscape variables like tree cover and cropland with more general climatic variables, I selected annual averages for rain and temperature instead of the quarterly averages. 
 
 
-```{r}
+```{r, fig.cap = "**Figure 1.** PCA biplot shows the relationship between 8 different climatic and environmental variables for 188 countries utilizing data from @zander_venter on Kaggle."}
 world_env_vars <- read.csv(here("data", "world_env_vars.csv")) %>% 
   clean_names()
 
