@@ -25,7 +25,7 @@ frog_data <- read_excel(here("data","sierra_amphibians.xlsx"))
 #### Total Mountain Yellow-Legged Frog count each year
 
 ```{r}
-
+# Data Wrangling: yellow legged frog counts each year
 total_yellow <- frog_data %>% 
   filter(amphibian_species == "RAMU") %>% 
   filter(amphibian_life_stage != "EggMass") %>% 
@@ -34,17 +34,16 @@ total_yellow <- frog_data %>%
   drop_na(amphibian_number) %>% 
   count(year, amphibian_life_stage, wt = amphibian_number)
 
-
+# Create Data Visualization: yellow legged frogs by life stage
 year_totals <-ggplot(total_yellow, aes(x = year, y = n))+
-  geom_col(fill = "darkslategray3")+
-  facet_wrap(~amphibian_life_stage)+
+  geom_col(aes(fill = amphibian_life_stage))+
+  scale_fill_manual(values = c("#bae4bc", "#7bccc4", "#2b8cbe"))+
   labs(
     x = "Year",
     y = "Total Count",
-    title = "Mountian Yellow-Legged Frog Count by Life Stage"
+    title = "Mountian Yellow-Legged Frog Count by Life Stage",
+    fill = "Amphibian Life Stage"
   )
-  
-# Question: not sure best way to present data with the different life stages having such spread out values; when displaying tadpoles it makes it hard to read adult stage. Would the stacked graph be better? using fill = amphibian_life_stage to show the relative amounts? or is that harder to read?
 
 
 ```
@@ -52,7 +51,7 @@ year_totals <-ggplot(total_yellow, aes(x = year, y = n))+
 
 #### Top 5 lakes with greatest Adult and SubAdult counts of Yellow-Legged Frogs
 ```{r}
-
+# Data Wrangling: Total counts of yellow legged subadult and adults; top 5 lakes
 lake_counts <- frog_data %>% 
   filter(amphibian_species == "RAMU") %>% 
   filter(amphibian_life_stage == c("Adult", "SubAdult")) %>% 
@@ -62,6 +61,7 @@ lake_counts <- frog_data %>%
   rename(total_amphibian = n) %>% 
   slice_max(total_amphibian, n = 5)
 
+# Create Data Visualization: visualize top 5 lakes; flip axes for better conformation
 top5 <- ggplot(lake_counts, aes(x = fct_reorder(lake_id, total_amphibian), y = total_amphibian))+
   geom_col(fill = "darkslategray3")+
   coord_flip()+
@@ -76,9 +76,10 @@ top5 <- ggplot(lake_counts, aes(x = fct_reorder(lake_id, total_amphibian), y = t
 
 #### Data Visualization for Mountain Yellow-Legged Frogs
 
-```{r, fig.cap = "**Figure 1**. Mass (g) vs height (m)"}
+```{r, fig.cap = "**Figure 1.** Top figure shows Mountain Yellow-Legged Frog counts in each year of the study across all water bodies. Adult, Subadult and Tadpole counts are shown separately. Bottom figure displays lakes with the top 5 highest Mountain Yellow-legged Frog counts across all years of the study collectivley." }
 
-patchwork_graph <- (year_totals/top5) & theme_minimal()
+patchwork_graph <- (year_totals/top5) & 
+  theme_minimal()
 
 patchwork_graph
 ```
